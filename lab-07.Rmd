@@ -26,24 +26,46 @@ glimpse(college_grad_df)
 # Exercise 1: Exploratory Data Analysis
 
 ```{r}
-#your code here
+college_grad_df %>%
+  ggplot(aes(x = median)) +
+  geom_histogram(binwidth = 2500)
+college_recent_grads %>%
+  group_by(major_category) %>%
+  summarise(median_earnings = median(median,na.rm = FALSE)) %>%
+  arrange(desc(median_earnings))
 ```
 
 *Your explanation*
-
+The shape of the distribution is a right skewed cause most majors have a low earning median.Engineering has the highest median earnings.
 
 # Exercise 2: Exploring relationship
 
 ```{r}
-#your code here
+#The median earnings is the response and the women share is the explanatory variable.
+college_grad_df %>%
+  ggplot(aes(x = sharewomen,y = median)) +
+  geom_point() +
+  geom_smooth(method = "lm",se=FALSE) +
+  labs(
+    x = "Share of women",
+    y = "Median earnings"
+  )
 ```
 
-*Your explanation*
+The relationship is moderate linear between median earnings and sharewomen,and it's negative because as share of women increased,the median earnings decreased.
 
 # Exercise 3: Fit and interpret a numerical predictor
 
 ```{r}
-#your code here
+share_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(median ~ sharewomen, data = college_grad_df)
+tidy(share_fit)
+#median = 56093.31-30669.94*sharewomen
+share_aug <- augment(share_fit$fit)
+ggplot(share_aug, aes(x = .fitted, y = .resid)) +
+  geom_point() +
+  geom_hline(yintercept = 0, lty = "dashed")
 ```
 
 *Your explanation*
